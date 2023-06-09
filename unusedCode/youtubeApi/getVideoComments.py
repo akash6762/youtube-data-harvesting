@@ -1,5 +1,5 @@
-from config import YOUTUBE
-from getVideoDetails import getVideoDetails
+from scripts import YOUTUBE
+from scripts import getVideoDetails
 
 
 def getComments(videoId):
@@ -32,3 +32,4 @@ def getComments(videoId):
     return comments
 
 
+__all__ = ["getComments"]

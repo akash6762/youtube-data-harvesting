@@ -1,12 +1,24 @@
-from getChannelId import getChannelIdByName
-from getPlaylistId import getPlaylistId
-from getVideoIds import getVideoIds
-from getVideoDetails import getVideoDetails
+from scripts import getChannelIdByName
+from scripts import getPlaylistId
+from scripts import getVideoIds
+from scripts import getVideoDetails
+from scripts import YOUTUBE
 import json
-from config import YOUTUBE
+
+# playlist id
+def scrapePlaylistId(channelId: str):
+    
+    request = YOUTUBE.channels().list(
+        part = 'contentDetails',
+        id = channelId
+    )
+    response = request.execute()
+    playlist_id = response["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+    return playlist_id
 
 
-def makeChannelDetails(channelName):
+def makeChannelDetails(nameOrId: str, streamlitOption: str):
     """
 
     Parameters
@@ -18,9 +30,12 @@ def makeChannelDetails(channelName):
 
     """
 
-    channelId = getChannelIdByName(channelName) # channel id
-    playlistId = getPlaylistId(channelId) # playlist id
+    if streamlitOption == "channel name":
+        channelId = getChannelIdByName(nameOrId) # channel id
+    if streamlitOption == "channel id":
+        channelId = nameOrId
 
+    playlist_id = scrapePlaylistId(channelId)
     request = YOUTUBE.channels().list(
         id=channelId,
         part="snippet, statistics"
@@ -32,7 +47,7 @@ def makeChannelDetails(channelName):
         "subscription_count": response["items"][0]["statistics"]["subscriberCount"],
         "channel_views": response["items"][0]["statistics"]["viewCount"],
         "channel_description": response["items"][0]["snippet"]["description"],
-        "playlist_id": playlistId
+        "playlist_id": playlist_id
     }
 
     return channel_name
@@ -69,10 +84,17 @@ def extractItemsFromComments(videoId: str):
     return comment, commentCount
     
     
-def makeVideoDetailsAndComments(channelName: str):
-    channel_id = getChannelIdByName(channelName)  # channel id
+def makeVideoDetailsAndComments(nameOrId: str, streamlitOption: str):
+    
+    if streamlitOption == "channel name":
+        channel_id = getChannelIdByName(nameOrId)  # channel id
+        
+    if streamlitOption == "channel id":
+        channel_id = nameOrId
+        
     playlist_id = getPlaylistId(channel_id)  # playlist id
     video_ids = getVideoIds(playlist_id)  # list of all video ids
+
     
     videoAndCommentsData = []
     for index, video_id in enumerate(video_ids):
@@ -124,9 +146,9 @@ def makeVideoDetailsAndComments(channelName: str):
     return videoAndCommentsData
     
 
-def combineData(channelName: str):
-    channelDetails = makeChannelDetails(channelName)
-    videoDataAndComments = makeVideoDetailsAndComments(channelName)
+def combineData(nameOrId: str, streamlitNameOrId: str):
+    channelDetails = makeChannelDetails(nameOrId, streamlitNameOrId)
+    videoDataAndComments = makeVideoDetailsAndComments(nameOrId, streamlitNameOrId)
     
     processedData = {
         "channel_name": channelDetails, 
@@ -135,3 +157,14 @@ def combineData(channelName: str):
 
     return processedData
 
+
+
+__all__ = ["makeChannelDetails",
+           "extractItemsFromComments",
+           "makeVideoDetailsAndComments", 
+           "combineData"]
+
+if __name__ == '__main__':
+    data = combineData("future demand", "channel name")
+    with open("data.json", "w") as file:
+        json.dump(data, file, indent=4)

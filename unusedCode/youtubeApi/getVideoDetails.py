@@ -1,6 +1,4 @@
-from googleapiclient.discovery import build
-import json
-from config import YOUTUBE
+from scripts import YOUTUBE
 
 
 def getVideoDetails(videoId):
@@ -22,3 +20,6 @@ def getVideoDetails(videoId):
     response = request.execute()
 
     return response
+
+
+__all__ = ["getVideoDetails"]

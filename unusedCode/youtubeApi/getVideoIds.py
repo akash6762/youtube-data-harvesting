@@ -1,5 +1,4 @@
-from googleapiclient.discovery import build
-from config import YOUTUBE
+from scripts import YOUTUBE
 
 
 def getVideoIds(PlaylistId: str) -> list:
@@ -36,3 +35,6 @@ def getVideoIds(PlaylistId: str) -> list:
         videoIds.append(_id)
 
     return videoIds
+
+
+__all__ = ["getVideoIds"]

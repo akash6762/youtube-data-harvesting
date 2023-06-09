@@ -4,7 +4,6 @@ from scripts import YOUTUBE
 
 def getChannelIdByName(channelName: str) -> str:
     """
-
     Parameters
     ----------
     channelName: name of the YouTube channel, type: str
@@ -23,3 +22,6 @@ def getChannelIdByName(channelName: str) -> str:
     channel_id = response["items"][0]["id"]["channelId"]
 
     return channel_id
+
+
+_all__ = ["getChannelIdByName"]

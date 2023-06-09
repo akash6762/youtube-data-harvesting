@@ -1,10 +1,11 @@
 import json
-
 import requests
 import streamlit as st
 from streamlit_option_menu import option_menu
+from scripts import makeVideoDetailsAndComments
+from scripts import cssForWholeApp
+import json
 
-from css_js import css_js_for_whole_app
 
 # page configurations
 st.set_page_config(
@@ -35,9 +36,8 @@ with st.sidebar:
         icons = ["house", "youtube", "bar-chart-fill",  "question-circle-fill"]
     )
     
-# custum css
-st.markdown(css_js_for_whole_app, unsafe_allow_html=True)
-
+# custom css
+st.markdown(cssForWholeApp, unsafe_allow_html=True)
 
 if selected == "Home":
     
@@ -57,14 +57,14 @@ Are you ready to unlock the potential of YouTube data? Get started with our app 
 
 if selected == "Scraper":
     st.markdown("""
-                <h1> SCRAPER </h1>
-                
+                <h1 class="header"> SCRAPER </h1>
                 """,
                 unsafe_allow_html=True)
+    
     left_column, right_column = st.columns(2)
     with right_column:
         options = ["channel id", "channel name"]
-        default = 0
+        default = 1
         name_or_id_select = st.selectbox(
             "select an option", 
             options, 
@@ -74,12 +74,18 @@ if selected == "Scraper":
     with left_column:
         if name_or_id_select == "channel id":
             channel_name_or_id = st.text_input("Enter channel id")
+            selectOption = "channel id"
+            
         if name_or_id_select == "channel name":
             channel_name_or_id = st.text_input("Enter channel name")
+            selectOption = "channel name"
             
     st.markdown("<br>", unsafe_allow_html=True)
     
-    execute = st.button("Execute")
+    if st.button("Execute"):
+        data = makeVideoDetailsAndComments(channel_name_or_id, selectOption)
+        with open("data.json", "w") as file:
+            json.dump(data, file, indent=4)
 
 if selected == "Analytics":
     st.markdown("""

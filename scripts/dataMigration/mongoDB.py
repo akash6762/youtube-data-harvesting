@@ -1,12 +1,14 @@
-import sys
-import os
 from pymongo import MongoClient
-from youtubeApi.getChannelId import getChannelIdByName
+from scripts import makeVideoDetailsAndComments
 
-if __name__ == '__main__':
-    print(getChannelIdByName("future demand"))
+client = MongoClient("mongodb://localhost:27017")
+database = client["youtubeData"]
+collection = database["videoData"]
 
+def pushToMongodb(channelName: str):
+    data = makeVideoDetailsAndComments(channelName)
+    result = collection.insert_one(data)
+    client.close()
 
-"""client = MongoClient("mongodb://127.0.0.1:27017") # mongo client 
-database = client["youtube"] # database
-doument = database["statistics"] # document"""
+def retriveFromMongodb():
+    pass

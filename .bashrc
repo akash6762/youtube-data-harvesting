@@ -1,0 +1,1 @@
+export PYTHONPATH = "/home/akash/D/projects/youtube"
